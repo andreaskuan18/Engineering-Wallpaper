@@ -29,6 +29,26 @@
     <h1>Engineering Wallpaper Generator</h1>
     <p>Centered desktop-safe layout. Enter screen specs, generate a wallpaper, then download it as a PNG.</p>
 
+    <div style="margin-top:16px; padding:16px; border-radius:12px; background:#121922; border:1px solid #243140;">
+      <strong>How to use:</strong>
+      <ul style="margin-top:8px; padding-left:18px; line-height:1.5;">
+        <li><b>Screen width / height (px):</b> Your display resolution (e.g. 2560 × 1440)</li>
+        <li><b>Diagonal (inches):</b> Physical screen size (e.g. 27")</li>
+        <li><b>Calibration %:</b> Fine-tune scaling if needed (leave at 100% normally)</li>
+      </ul>
+
+      <strong style="display:block; margin-top:10px;">How to find your screen size:</strong>
+      <ul style="margin-top:6px; padding-left:18px; line-height:1.5;">
+        <li>Find your monitor model (back label or system settings)</li>
+        <li>Search: <i>"[model name] screen size"</i></li>
+        <li>Example: "Dell U2720Q" → 27 inches</li>
+      </ul>
+
+      <div style="margin-top:10px; font-size:13px; color:#9aa7b2;">
+        Note: Resolution alone is NOT enough for accurate scaling — physical screen size is required.
+      </div>
+    </div>
+
     <section class="controls">
       <div>
         <label for="preset">Preset</label>
@@ -92,9 +112,17 @@
     ];
 
     const commonDrills = [
-      ['1/16', '0.0625 in', '1.59 mm'], ['3/32', '0.0938 in', '2.38 mm'], ['1/8', '0.1250 in', '3.18 mm'],
-      ['5/32', '0.1563 in', '3.97 mm'], ['3/16', '0.1875 in', '4.76 mm'], ['1/4', '0.2500 in', '6.35 mm'],
-      ['5/16', '0.3125 in', '7.94 mm'], ['3/8', '0.3750 in', '9.53 mm'], ['1/2', '0.5000 in', '12.70 mm']
+      ['1/16', '0.0625 in', '1.59 mm'],
+      ['3/32', '0.0938 in', '2.38 mm'],
+      ['1/8', '0.1250 in', '3.18 mm'],
+      ['5/32', '0.1563 in', '3.97 mm'],
+      ['3/16', '0.1875 in', '4.76 mm'],
+      ['7/32', '0.2188 in', '5.56 mm'],
+      ['1/4', '0.2500 in', '6.35 mm'],
+      ['9/32', '0.2813 in', '7.14 mm'],
+      ['5/16', '0.3125 in', '7.94 mm'],
+      ['3/8', '0.3750 in', '9.53 mm'],
+      ['1/2', '0.5000 in', '12.70 mm']
     ];
 
     const commonComponents = [
@@ -154,8 +182,29 @@
     }
 
     function compactChart(x, y, w, h, title, rows, fs) {
-      panel(x, y, w, h, title, fs); const startY = y + fs * 3.45; const rowH = (h - fs * 4.3) / rows.length;
-      rows.forEach((row, i) => { const yy = startY + i * rowH; ctx.strokeStyle = 'rgba(255,255,255,0.13)'; ctx.beginPath(); ctx.moveTo(x + fs, yy + fs * 0.55); ctx.lineTo(x + w - fs, yy + fs * 0.55); ctx.stroke(); ctx.fillStyle = 'rgba(255,255,255,0.92)'; text(row[0], x + fs, yy, fs * 0.68, '800'); text(row[1], x + w - fs, yy, fs * 0.68, '600', 'right'); });
+      panel(x, y, w, h, title, fs);
+      const startY = y + fs * 3.45;
+      const rowH = (h - fs * 4.4) / rows.length;
+      const pad = fs;
+
+      rows.forEach((row, i) => {
+        const yy = startY + i * rowH;
+        ctx.strokeStyle = 'rgba(255,255,255,0.13)';
+        ctx.beginPath();
+        ctx.moveTo(x + pad, yy + fs * 0.55);
+        ctx.lineTo(x + w - pad, yy + fs * 0.55);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(255,255,255,0.92)';
+
+        if (row.length === 3) {
+          text(row[0], x + pad, yy, fs * 0.66, '800');
+          text(row[1], x + w * 0.62, yy, fs * 0.66, '600', 'right');
+          text(row[2], x + w - pad, yy, fs * 0.66, '600', 'right');
+        } else {
+          text(row[0], x + pad, yy, fs * 0.66, '800');
+          text(row[1], x + w - pad, yy, fs * 0.66, '600', 'right');
+        }
+      });
     }
 
     function drawProtractor(x, y, radius, fs) {
@@ -175,7 +224,7 @@
       const fs = Math.max(14, Math.min(24, width / 145));
       const top = Math.max(40, height * 0.035);
       const bottomSafe = Math.max(105, height * 0.10);
-      const contentW = Math.min(width * 0.66, 1420);
+      const contentW = Math.min(width * 0.72, 1560);
       const x0 = (width - contentW) / 2;
       const gap = fs * 0.9;
 
@@ -201,9 +250,9 @@
 
       const y4 = y3 + tableH + gap;
       const thirdW = (contentW - gap * 2) / 3;
-      const infoH = fs * 9.4;
-      compactChart(x0, y4, thirdW, infoH, 'COMMON DRILL SIZES', commonDrills, fs);
-      compactChart(x0 + thirdW + gap, y4, thirdW, infoH, 'COMMON COMPONENT DIMENSIONS', commonComponents, fs);
+      const infoH = fs * 13.2;
+      compactChart(x0, y4, thirdW, infoH, 'COMMON DRILL SIZES', [['Size', 'Decimal in', 'mm'], ...commonDrills], fs);
+      compactChart(x0 + thirdW + gap, y4, thirdW, infoH, 'COMMON COMPONENTS', commonComponents, fs);
       compactChart(x0 + (thirdW + gap) * 2, y4, thirdW, infoH, 'UNIT CONVERSIONS', [
         ['1 in', '25.4 mm'], ['1 mm', '0.03937 in'], ['1 N·m', '8.85 in·lbf'], ['1 in·lbf', '0.113 N·m'], ['1 MPa', '145 psi'], ['1 kg', '2.205 lb'], ['1 lb', '4.448 N'], ['°C → °F', '×9/5 + 32']
       ], fs);
